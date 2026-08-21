@@ -1,0 +1,8 @@
+# 将本文件复制为 config.yml，并替换 Tunnel ID 与凭据文件路径。
+tunnel: REPLACE_WITH_TUNNEL_ID
+credentials-file: C:/Users/PC/.cloudflared/REPLACE_WITH_TUNNEL_ID.json
+
+ingress:
+  - hostname: zotero-mcp.example.com
+    service: http://127.0.0.1:8000
+  - service: http_status:404
