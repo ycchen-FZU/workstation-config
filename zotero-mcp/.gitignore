@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+.batch_tmp/
+config/zotero-mcp-config.json
+integrations/document2md.js

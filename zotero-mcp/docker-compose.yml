@@ -1,0 +1,68 @@
+services:
+  zotero-mcp:
+    image: zotero-mcp:0.9.1-jina-cuda
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7897}
+        HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7897}
+        NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,host.docker.internal}
+    command:
+      - serve
+      - --transport
+      - streamable-http
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    env_file:
+      - path: ${ZOTERO_MCP_ENV_FILE:-C:/Users/PC/.codex/zotero-mcp.env}
+        required: true
+    environment:
+      ZOTERO_LOCAL: "${ZOTERO_LOCAL:-true}"
+      ZOTERO_LOCAL_API_BASE: ${ZOTERO_LOCAL_API_BASE:-http://host.docker.internal:23119/api}
+      ZOTERO_DB_PATH: ${ZOTERO_DB_PATH:-/mnt/zotero/zotero.sqlite}
+      ZOTERO_EMBEDDING_MODEL: ${ZOTERO_EMBEDDING_MODEL:-jinaai/jina-embeddings-v5-text-small}
+      ZOTERO_MCP_TOOLSETS: ${ZOTERO_MCP_TOOLSETS:-none,discovery,relations,scite,chatgpt-connector}
+      ZOTERO_MCP_AUTH_ISSUER: ${ZOTERO_MCP_AUTH_ISSUER:-https://auth.chen-group.cn}
+      ZOTERO_MCP_RESOURCE_URL: ${ZOTERO_MCP_RESOURCE_URL:-https://zotero.chen-group.cn}
+      ZOTERO_MCP_JWKS_URI: ${ZOTERO_MCP_JWKS_URI:-https://auth.chen-group.cn/jwks.json}
+      FASTMCP_STREAMABLE_HTTP_PATH: /
+      ZOTERO_EMBEDDING_DEVICE: ${ZOTERO_EMBEDDING_DEVICE:-cuda}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      HF_HOME: /root/.cache/huggingface
+      HUGGINGFACE_HUB_CACHE: /root/.cache/huggingface/hub
+      TRANSFORMERS_CACHE: /root/.cache/huggingface/hub
+      HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7897}
+      HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7897}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,host.docker.internal}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    gpus: all
+    volumes:
+      - type: bind
+        source: ${ZOTERO_DATA_DIR:-E:/OneDrive/02_科研/Zotero}
+        target: /mnt/zotero
+        read_only: true
+      - type: bind
+        source: ./config/zotero-mcp-config.json
+        target: /root/.config/zotero-mcp/config.json
+        read_only: false
+      - type: volume
+        source: zotero-mcp-chroma
+        target: /root/.config/zotero-mcp/chroma_db
+      - type: volume
+        source: jina-model-cache
+        target: /root/.cache/huggingface
+    ports:
+      - "127.0.0.1:${ZOTERO_MCP_PORT:-8000}:8000"
+    restart: unless-stopped
+
+volumes:
+  zotero-mcp-chroma:
+  jina-model-cache:
+    external: true
+    name: jina-embedding-benchmark_jina-model-cache
