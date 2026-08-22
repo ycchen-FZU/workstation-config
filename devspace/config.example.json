@@ -1,0 +1,14 @@
+{
+  "host": "127.0.0.1",
+  "port": 7676,
+  "allowedRoots": [
+    "E:\\代码"
+  ],
+  "publicBaseUrl": "https://devspace-<workstation>.chen-group.cn",
+  "oauth": {
+    "issuer": "https://auth.chen-group.cn",
+    "resourceUrl": "https://devspace-<workstation>.chen-group.cn",
+    "jwksUri": "https://auth.chen-group.cn/jwks.json",
+    "scopes": []
+  }
+}
